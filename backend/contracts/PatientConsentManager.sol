@@ -220,28 +220,26 @@ contract PatientConsentManager {
      * @return hasConsent Whether active consent exists
      * @return consentId The ID of the consent if found
      */
-    function hasActiveConsent(
+     // add preferred lookup function for active consent
+    function hasValidConsent(
         address patient,
         address provider,
         string memory dataType
-    ) public view returns (bool hasConsent, uint256 consentId) {
-        uint256[] memory consents = patientConsents[patient];
+    ) public view returns (bool hasConsent, uint256) {
+        bytes32 dataKey = keccak256(bytes(dataType));
+        uint256 consentId = activeConnsentByRelation[patient][provider][dataKey];
         
-        for (uint256 i = 0; i < consents.length; i++) {
-            ConsentRecord memory consent = consentRecords[consents[i]];
-            if (
-                consent.providerAddress == provider &&
-                keccak256(bytes(consent.dataType)) == keccak256(bytes(dataType)) &&
-                consent.isActive &&
-                (consent.expirationTime == 0 || consent.expirationTime > block.timestamp)
-            ) {
-                return (true, consents[i]);
-            }
+        if (consentId == 0 && consentRecords[0].patientAddress != patient) {
+            return (false, 0);
         }
-        
-        return (false, 0);
-    }
 
+        ConsentRecord memory consent = consentRecords[consentId];
+
+        bool valid = consent.isActive && (consent.expirationTime == 0 || consent.expirationTime > block.timestamp);
+
+        return (valid, consentId);
+    }
+    
     /**
      * @dev Get all consent IDs for a patient
      * @param patient The address of the patient
