@@ -105,6 +105,8 @@ contract PatientConsentManager {
         require(provider != msg.sender, "Cannot grant consent to self");
         require(bytes(dataType).length > 0, "DataType cannot be empty");
         require(bytes(purpose).length > 0, "Purpose cannot be empty");
+        bytes32 dataKey = keccak256(bytes(dataType));
+        activeConsentByRelation[msg.sender][provider][dataKey] = consentId;
 
         uint256 consentId = consentCounter++;
         
