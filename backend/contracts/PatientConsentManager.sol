@@ -5,7 +5,8 @@ pragma solidity ^0.8.20;
  * @title PatientConsentManager
  * @dev Smart contract for managing patient consent and data access permissions
  * This contract implements a decentralized consent management system for healthcare data
- */
+*/
+
 contract PatientConsentManager {
     // Struct to represent a consent record
     struct ConsentRecord {
@@ -28,6 +29,10 @@ contract PatientConsentManager {
         bool isApproved;
         bool isProcessed;
     }
+
+    // add direct lookup mapping for consent
+    mapping(address => mapping(address = > mapping(bytes32 => uint256)))
+    private activeConsentByRelation;
 
     // Mapping from consent ID to consent record
     mapping(uint256 => ConsentRecord) public consentRecords;
